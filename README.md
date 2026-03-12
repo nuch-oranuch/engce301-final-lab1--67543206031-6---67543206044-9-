@@ -14,15 +14,15 @@ Browser / Postman
 ┌─────────────────────────────────────────────────────────────┐
 │  🛡️ Nginx (API Gateway + TLS Termination + Rate Limiter)    │
 │                                                             │
-│  /api/auth/* → auth-service:3001    (ไม่ต้องมี JWT)          │
+│  /api/auth/* → auth-service:3001    (ไม่ต้องมี JWT)            │
 │  /api/tasks/* → task-service:3002    [JWT required]         │
-│  /api/logs/* → log-service:3003     [JWT required]         │
-│  /              → frontend:80          (Static HTML)          │
+│  /api/logs/* → log-service:3003     [JWT required]          │
+│  /              → frontend:80          (Static HTML)        │
 └───────┬────────────────┬──────────────────┬─────────────────┘
         │                │                  │
         ▼                ▼                  ▼
 ┌──────────────┐ ┌───────────────┐ ┌──────────────────┐
-│ 🔑 Auth Svc  │ │ 📋 Task Svc   │ │ 📝 Log Service   │
+│ 🔑 Auth Svc  │ │ 📋 Task Svc   │ │ 📝 Log Service  │
 │   :3001      │ │   :3002       │ │   :3003          │
 │              │ │               │ │                  │
 │ • Login      │ │ • CRUD Tasks  │ │ • POST /api/logs │
@@ -33,7 +33,7 @@ Browser / Postman
        └────────┬────────┘
                 ▼
      ┌─────────────────────┐
-     │  🗄️ PostgreSQL       │
+     │  🗄️ PostgreSQL      │
      │  (1 shared DB)      │
      │  • users  table     │
      │  • tasks  table     │
