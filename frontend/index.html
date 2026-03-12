@@ -841,23 +841,41 @@ async function quickStatusUpdate(id, newStatus) {
 }
 
 let deleteTargetId = null;
+
 function confirmDelete(id) {
+  console.log("กำลังจะลบ Task ID:", id); // ตรวจสอบ ID ใน Console
   deleteTargetId = id;
   document.getElementById('confirm-modal').classList.remove('hidden');
-  document.getElementById('confirm-delete-btn').onclick = async () => {
-    const res = await apiFetch(`${API}/api/tasks/${deleteTargetId}`, {
-      method: 'DELETE',
-      headers: authHeaders()
-    });
-    if (res.ok) {
-      toast('🗑️ ลบ Task แล้ว', 'info');
+  
+  // ตั้งค่าปุ่มลบ
+  const deleteBtn = document.getElementById('confirm-delete-btn');
+  deleteBtn.onclick = async () => {
+    deleteBtn.innerHTML = '<span class="spinner"></span> กำลังลบ...';
+    deleteBtn.disabled = true;
+
+    try {
+      const res = await apiFetch(`${API}/api/tasks/${deleteTargetId}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+
+      if (res.ok) {
+        toast('🗑️ ลบ Task เรียบร้อยแล้ว', 'info');
+        closeConfirm();
+        loadTasks(); // โหลดรายการใหม่
+      } else {
+        const data = await res.json().catch(() => ({ error: 'Unknown Error' }));
+        console.error("Delete Failed:", data);
+        toast('❌ ลบไม่ได้: ' + (data.error || 'เกิดข้อผิดพลาด'), 'error');
+        closeConfirm();
+      }
+    } catch (err) {
+      console.error("Network Error:", err);
+      toast('❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
       closeConfirm();
-      loadTasks();
-    } else {
-      const data = await res.json();
-      if (res.status === 403) toast('🚫 403 Forbidden: คุณลบ Task ของคนอื่นไม่ได้', 'error', 4000);
-      else toast('❌ ' + (data.error || 'Error'), 'error');
-      closeConfirm();
+    } finally {
+      deleteBtn.innerHTML = '🗑️ ลบเลย';
+      deleteBtn.disabled = false;
     }
   };
 }
